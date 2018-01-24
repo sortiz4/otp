@@ -1,0 +1,13 @@
+[package]
+name = "vernam"
+version = "1.0.0"
+license = "MIT License"
+authors = ["sortiz4 <sortiz832@gmail.com>"]
+
+[[bin]]
+name = "vernam"
+doc = false
+
+[dependencies]
+getopts = "0.2.15"
+rand = "0.4"
