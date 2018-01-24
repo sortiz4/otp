@@ -41,10 +41,12 @@ fn vernam(args: Vec<String>) -> i32 {
     if matches.opt_present(opts::ENCRYPT.short) {
         if let Err(err) = core::encrypt_file(&matches.free[0]) {
             sprintln!("{}", err);
+            return status::EIO;
         }
     } else if matches.opt_present(opts::DECRYPT.short) {
         if let Err(err) = core::decrypt_file(&matches.free[0], &matches.free[1]) {
             sprintln!("{}", err);
+            return status::EIO;
         }
     }
     return status::ESUCCESS;

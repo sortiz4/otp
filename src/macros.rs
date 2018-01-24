@@ -11,13 +11,6 @@ macro_rules! indent {
     ($fmt:expr, $($arg:tt)*) => (indent![concat![$fmt, $(" ", $arg)*]]);
 }
 
-/// Prepends the program name to the given message.
-#[macro_export]
-macro_rules! formats {
-    ($fmt:expr) => (format!(concat![name![], ": ", $fmt]));
-    ($fmt:expr, $($arg:tt)*) => (format!(concat![name![], ": ", $fmt], $($arg)*));
-}
-
 /// Writes a formatted system message to the standard error.
 #[macro_export]
 macro_rules! sprint {

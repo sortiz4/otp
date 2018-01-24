@@ -47,7 +47,7 @@ macro_rules! optflags {
 }
 
 /// Reformats the `getopts` error message.
-macro_rules! opts {
+macro_rules! reformat {
     ($var:expr) => ($var.to_string().to_lowercase().trim_right_matches(".").to_owned());
 }
 
@@ -55,6 +55,23 @@ macro_rules! opts {
 macro_rules! help {
     ($fmt:expr) => (format!(concat!($fmt, "\n{}"), text::HELP));
     ($fmt:expr, $($arg:tt)*) => (format!(concat!($fmt, "\n{}"), $($arg)*, text::HELP));
+}
+
+/// Checks if the path exists and is a file.
+fn validate_file(file: &String) -> Result<(), String> {
+    let file = Path::new(file);
+    if !file.exists() || !file.is_file() {
+        return Err(help!("'{}' {}", file.display(), status::MNOTFOUND));
+    }
+    return Ok(());
+}
+
+/// Checks if the number of free arguments matches the length.
+fn validate_len(matches: &Matches, len: usize) -> Result<(), String> {
+    if matches.free.len() < len {
+        return Err(help!("{}", status::MARGS));
+    }
+    return Ok(());
 }
 
 /// Initializes a set of options from the option definitions.
@@ -68,36 +85,23 @@ pub fn create() -> Options {
 pub fn parse(args: &Vec<String>, options: &Options) -> Result<Matches, String> {
     let matches = match options.parse(&args[1..]) {
         Ok(val) => val,
-        Err(err) => return Err(help!("{}", opts!(err))),
+        Err(err) => return Err(help!("{}", reformat!(err))),
     };
     return Ok(matches);
 }
 
-/// Checks for conflicts in the set of matches.
+/// Checks for conflicts and issues in the set of matches.
 pub fn validate(matches: &Matches) -> Result<(), String> {
     if matches.opt_present(ENCRYPT.short) && matches.opt_present(DECRYPT.short) {
         return Err(help!("{}: '{}', '{}'", status::MCONFLICT, ENCRYPT.long, DECRYPT.long));
     }
     if matches.opt_present(ENCRYPT.short) {
-        if matches.free.len() < 1 {
-            return Err(help!("{}", "missing argument(s)"));
-        }
-        let file = Path::new(&matches.free[0]);
-        if !file.exists() || !file.is_file() {
-            return Err(help!("'{}' {}", file.display(), "is not a file"));
-        }
+        validate_len(matches, 1)?;
+        validate_file(&matches.free[0])?;
     } else if matches.opt_present(DECRYPT.short) {
-        if matches.free.len() < 2 {
-            return Err(help!("{}", "missing argument(s)"));
-        }
-        let file = Path::new(&matches.free[0]);
-        let key = Path::new(&matches.free[1]);
-        if !file.exists() || !file.is_file() {
-            return Err(help!("'{}' {}", file.display(), "is not a file"));
-        }
-        if !key.exists() || !key.is_file() {
-            return Err(help!("'{}' {}", key.display(), "is not a file"));
-        }
+        validate_len(matches, 2)?;
+        validate_file(&matches.free[0])?;
+        validate_file(&matches.free[1])?;
     }
     return Ok(());
 }
