@@ -38,9 +38,9 @@ pub fn encrypt_file(src: &String) -> Result<()> {
 
     // Encrypt the file and save the key
     for src_byte in src_buf.bytes() {
-        let dest_byte = rng.gen::<u8>();
-        key_buf.write(&[dest_byte])?;
-        dest_buf.write(&[src_byte? ^ dest_byte])?;
+        let key_byte = rng.gen::<u8>();
+        key_buf.write(&[key_byte])?;
+        dest_buf.write(&[src_byte? ^ key_byte])?;
     }
 
     // Flush the key buffer to the disk
