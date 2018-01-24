@@ -4,7 +4,7 @@ Encryption produces two files of equal size: a key file with the extension
 `.key` and the encrypted file with the extension `.vnm`. Decryption will
 produce (or overwrite) the original file without the `.vnm` extension.
 
-#### Usage
+## Usage
 
 ```
 A simple Vernam Cipher implementation.
