@@ -12,10 +12,10 @@ use std::io::Write;
 /// Key file extension.
 const EXT_KEY: &str = ".key";
 /// Ciphertext file extension.
-const EXT_CIPHER: &str = ".vnm";
+const EXT_CIPHER: &str = ".vm";
 
 /// Encrypts the source file. Two files will be created when this function
-/// returns: a key file `{src}.key` and the encrypted file `{src}.vnm`.
+/// returns: a key file `{src}.key` and the encrypted file `{src}.vm`.
 pub fn encrypt_file(src: &String) -> Result<()> {
     // Cache the thread-local random generator
     let mut rng = rand::thread_rng();
@@ -54,7 +54,7 @@ pub fn encrypt_file(src: &String) -> Result<()> {
 }
 
 /// Decrypts the source file with the key file. The unencrypted file will be
-/// created (or overwritten) when this function returns and the `.vnm`
+/// created (or overwritten) when this function returns and the `.vm`
 /// extension will be removed (if it exists).
 pub fn decrypt_file(src: &String, key: &String) -> Result<()> {
     // Open the source file and wrap it in a buffer
