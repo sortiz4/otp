@@ -1,13 +1,17 @@
 [package]
-name = "vernam"
-version = "1.0.0"
+name = "otp"
+edition = "2018"
+version = "2.0.0"
 license = "MIT License"
-authors = ["sortiz4 <sortiz832@gmail.com>"]
+authors = ["Steven Ortiz"]
+
+[lib]
+doc = false
 
 [[bin]]
-name = "vernam"
+name = "otp"
 doc = false
 
 [dependencies]
-getopts = "0.2.15"
-rand = "0.4"
+rand = "0.7.2"
+structopt = { version = "0.3.4", default-features = false }

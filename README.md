@@ -1,20 +1,18 @@
-# Vernam
-Vernam is a simple cryptographic command line utility offering perfect secrecy.
+# Otp
+Otp is a simple cryptographic command line utility offering perfect secrecy.
 Encryption produces two files of equal size: a key file with the extension
-`.key` and the encrypted file with the extension `.vm`. Decryption will
-produce (or overwrite) the original file without the `.vm` extension.
+`.key` and the encrypted file with the extension `.lock`. Decryption will
+produce (or overwrite) the original file without the `.lock` extension.
 
 ## Usage
+Encryption expects a single file.
 
+```sh
+$ otp -e [FILE]
 ```
-A simple Vernam Cipher implementation.
 
-Usage:
-    vernam [OPTIONS] [FILE] [KEY]
+Decryption expects two files.
 
-Options:
-    -d, --decrypt       Decrypt the file with the key
-    -e, --encrypt       Encrypt the file with a random key
-    -h, --help          Output this message
-    -V, --version       Output version information
+```sh
+$ otp -d [FILE] [KEY]
 ```
