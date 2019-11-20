@@ -5,7 +5,7 @@ Encryption produces two files of equal size: a key file with the extension
 produce (or overwrite) the original file without the `.lock` extension.
 
 ## Usage
-Encryption expects a single file.
+Encryption expects one file.
 
 ```sh
 $ otp -e [FILE]
