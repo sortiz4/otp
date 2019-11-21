@@ -67,9 +67,9 @@ impl Otp {
         return self;
     }
 
-    /// Runs this program (public).
+    /// Runs this program and writes all errors.
     pub fn run(&mut self) -> Result<()> {
-        match self.handle() {
+        match self.run_inner() {
             Ok(val) => {
                 return Ok(val);
             },
@@ -80,8 +80,8 @@ impl Otp {
         }
     }
 
-    /// Runs this program (private).
-    fn handle(&mut self) -> Result<()> {
+    /// Runs this program.
+    fn run_inner(&mut self) -> Result<()> {
         // Write the help or version message
         if self.options.help {
             return self.help();
