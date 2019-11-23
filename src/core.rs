@@ -90,7 +90,7 @@ impl Otp {
             return self.version();
         }
 
-        // Check for conflicting options
+        // Validate the options
         self.validate()?;
 
         // Encrypt or decrypt the file
@@ -103,7 +103,7 @@ impl Otp {
         };
     }
 
-    /// Checks for conflicts in the options.
+    /// Validates the options.
     fn validate(&self) -> Result<()> {
         let len = if self.options.encrypt {
             1
