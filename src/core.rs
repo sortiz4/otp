@@ -32,7 +32,7 @@ struct Options {
     #[structopt(short = "v", long = "version")]
     version: bool,
 
-    /// The files to be read by the tool.
+    /// The files to be read by this tool.
     #[structopt(name = "FILES", parse(from_str))]
     files: Vec<String>,
 }
@@ -94,28 +94,29 @@ impl Otp {
         self.validate()?;
 
         // Encrypt or decrypt the file
-        if self.options.encrypt {
-            self.encrypt_file()?;
+        return if self.options.encrypt {
+            self.encrypt_file()
         } else if self.options.decrypt {
-            self.decrypt_file()?;
-        }
-        return Ok(());
+            self.decrypt_file()
+        } else {
+            Ok(())
+        };
     }
 
     /// Checks for conflicts in the options.
     fn validate(&self) -> Result<()> {
-        if self.options.encrypt && self.options.decrypt {
-            return Err(Error::Conflict);
-        }
         let len = if self.options.encrypt {
             1
         } else {
             2
         };
-        if self.options.files.len() < len {
-            return Err(Error::Length);
-        }
-        return Ok(());
+        return if self.options.encrypt && self.options.decrypt {
+            Err(Error::Conflict)
+        } else if self.options.files.len() < len {
+            Err(Error::Length)
+        } else {
+            Ok(())
+        };
     }
 
     /// Writes the help message to the standard error stream.
