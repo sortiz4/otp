@@ -69,7 +69,29 @@ impl Otp {
 
     /// Runs this program and writes all errors.
     pub fn run(&mut self) -> Result<()> {
-        match self.run_inner() {
+        let mut run = || -> Result<()> {
+            // Write the help or version message
+            if self.options.help {
+                return self.help();
+            }
+            if self.options.version {
+                return self.version();
+            }
+
+            // Validate the options
+            self.validate()?;
+
+            // Encrypt or decrypt the file
+            return if self.options.encrypt {
+                self.encrypt_file()
+            } else if self.options.decrypt {
+                self.decrypt_file()
+            } else {
+                Ok(())
+            };
+        };
+
+        match run() {
             Ok(val) => {
                 return Ok(val);
             },
@@ -80,27 +102,18 @@ impl Otp {
         }
     }
 
-    /// Runs this program.
-    fn run_inner(&mut self) -> Result<()> {
-        // Write the help or version message
-        if self.options.help {
-            return self.help();
-        }
-        if self.options.version {
-            return self.version();
-        }
+    /// Writes the help message to the standard error stream.
+    fn help(&mut self) -> Result<()> {
+        Options::clap().write_help(&mut self.stderr)?;
+        writeln!(self.stderr, "")?;
+        return Ok(());
+    }
 
-        // Validate the options
-        self.validate()?;
-
-        // Encrypt or decrypt the file
-        return if self.options.encrypt {
-            self.encrypt_file()
-        } else if self.options.decrypt {
-            self.decrypt_file()
-        } else {
-            Ok(())
-        };
+    /// Writes the version message to the standard error stream.
+    fn version(&mut self) -> Result<()> {
+        Options::clap().write_version(&mut self.stderr)?;
+        writeln!(self.stderr, "")?;
+        return Ok(());
     }
 
     /// Validates the options.
@@ -117,20 +130,6 @@ impl Otp {
         } else {
             Ok(())
         };
-    }
-
-    /// Writes the help message to the standard error stream.
-    fn help(&mut self) -> Result<()> {
-        Options::clap().write_help(&mut self.stderr)?;
-        writeln!(self.stderr, "")?;
-        return Ok(());
-    }
-
-    /// Writes the version message to the standard error stream.
-    fn version(&mut self) -> Result<()> {
-        Options::clap().write_version(&mut self.stderr)?;
-        writeln!(self.stderr, "")?;
-        return Ok(());
     }
 
     /// Encrypts the source file. Two files will be created when this function
