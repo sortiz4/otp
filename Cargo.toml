@@ -13,5 +13,5 @@ name = "otp"
 doc = false
 
 [dependencies]
-rand = "0.9.0"
 clap = { version = "4.5.32", features = ["derive"] }
+rand = "0.9.0"
