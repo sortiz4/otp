@@ -1,7 +1,7 @@
 [package]
 name = "otp"
-edition = "2021"
-version = "2.0.0"
+edition = "2024"
+version = "3.0.0"
 license = "MIT License"
 authors = ["Steven Ortiz"]
 
@@ -13,5 +13,5 @@ name = "otp"
 doc = false
 
 [dependencies]
-rand = "0.8.5"
-structopt = { version = "0.3.26", default-features = false }
+rand = "0.9.0"
+clap = { version = "4.5.32", features = ["derive"] }

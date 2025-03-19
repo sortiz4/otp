@@ -1,3 +1,5 @@
+use clap::CommandFactory;
+use clap::Parser;
 use rand;
 use rand::Rng;
 use std::ffi::OsString;
@@ -9,31 +11,30 @@ use std::io::BufWriter;
 use std::io::Read;
 use std::io::Stderr;
 use std::io::Write;
-use structopt::StructOpt;
 use super::Error;
 use super::Result;
 
-#[derive(Debug, StructOpt)]
-#[structopt(about = "A simple one-time pad implementation.")]
+#[derive(Debug, Parser)]
+#[command(version, disable_help_flag = true, disable_version_flag = true, about = "A simple one-time pad implementation.")]
 struct Options {
     /// Encrypt the file with a random key.
-    #[structopt(short = "e", long = "encrypt")]
+    #[arg(short = 'e', long = "encrypt")]
     encrypt: bool,
 
     /// Decrypt the file with a key.
-    #[structopt(short = "d", long = "decrypt")]
+    #[arg(short = 'd', long = "decrypt")]
     decrypt: bool,
 
     /// Show this message.
-    #[structopt(short = "h", long = "help")]
+    #[arg(short = 'h', long = "help")]
     help: bool,
 
     /// Show the version.
-    #[structopt(short = "v", long = "version")]
+    #[arg(short = 'v', long = "version")]
     version: bool,
 
     /// The files to be read by this tool.
-    #[structopt(name = "FILES", parse(from_str))]
+    #[arg(name = "FILES")]
     files: Vec<String>,
 }
 
@@ -55,7 +56,7 @@ impl Otp {
     {
         return Ok(
             Self {
-                options: Options::from_iter_safe(iter)?,
+                options: Options::try_parse_from(iter)?,
                 stderr: io::stderr(),
             }
         );
@@ -74,6 +75,7 @@ impl Otp {
             if self.options.help {
                 return self.help();
             }
+
             if self.options.version {
                 return self.version();
             }
@@ -104,15 +106,13 @@ impl Otp {
 
     /// Writes the help message to the standard error stream.
     fn help(&mut self) -> Result<()> {
-        Options::clap().write_help(&mut self.stderr)?;
-        writeln!(self.stderr, "")?;
+        write!(self.stderr, "{}", Options::command().render_help())?;
         return Ok(());
     }
 
     /// Writes the version message to the standard error stream.
     fn version(&mut self) -> Result<()> {
-        Options::clap().write_version(&mut self.stderr)?;
-        writeln!(self.stderr, "")?;
+        write!(self.stderr, "{}", Options::command().render_version())?;
         return Ok(());
     }
 
@@ -123,6 +123,7 @@ impl Otp {
         } else {
             2
         };
+
         return if self.options.encrypt && self.options.decrypt {
             Err(Error::Conflict)
         } else if self.options.files.len() < len {
@@ -136,7 +137,7 @@ impl Otp {
     /// returns: a key file `{src}.key` and the encrypted file `{src}.lock`.
     fn encrypt_file(&self) -> Result<()> {
         let src = &self.options.files[0];
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
 
         // Open the source file and wrap it in a buffer
         let src_file = File::open(src)?;
@@ -162,7 +163,7 @@ impl Otp {
 
         // Encrypt the file and save the key
         for src_byte in src_buf.bytes() {
-            let key_byte = rng.gen::<u8>();
+            let key_byte = rng.random::<u8>();
             key_buf.write(&[key_byte])?;
             dest_buf.write(&[src_byte? ^ key_byte])?;
         }
